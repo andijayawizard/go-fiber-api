@@ -1,0 +1,9 @@
+# Files/folders yang gak perlu di-copy ke Docker image
+tmp/
+vendor/
+.git/
+.gitignore
+.env
+*.md
+Dockerfile
+docker-compose.yml
