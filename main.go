@@ -1,19 +1,29 @@
 package main
 
 import (
+	"log"
+
 	"github.com/andijayawizard/go-fiber-api/database"
 	"github.com/andijayawizard/go-fiber-api/handlers"
 	"github.com/andijayawizard/go-fiber-api/middleware"
 	"github.com/andijayawizard/go-fiber-api/models"
+	"github.com/andijayawizard/go-fiber-api/seed"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	app := fiber.New()
 
 	// Connect DB & migrate
 	database.Connect()
 	database.DB.AutoMigrate(&models.Book{})
+	seed.SeedBooks()
 
 	// Global middleware
 	app.Use(middleware.RequireAPIKey)

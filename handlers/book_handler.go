@@ -1,15 +1,63 @@
 package handlers
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/andijayawizard/go-fiber-api/database"
 	"github.com/andijayawizard/go-fiber-api/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 func GetBooks(c *fiber.Ctx) error {
+	// Ambil query params
+	pageStr := c.Query("page", "1")
+	limitStr := c.Query("limit", "10")
+	search := c.Query("search", "")
+
+	// Convert string ke integer
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	offset := (page - 1) * limit
+
 	var books []models.Book
-	database.DB.Find(&books)
-	return c.JSON(books)
+	query := database.DB
+
+	// Kalau ada search query
+	if search != "" {
+		search = strings.ToLower(search)
+		query = query.Where("LOWER(title) LIKE ? OR LOWER(author) LIKE ?", "%"+search+"%", "%"+search+"%")
+	}
+
+	var total int64
+	query.Model(&models.Book{}).Count(&total)
+
+	// Ambil data books sesuai limit + offset
+	result := query.Limit(limit).Offset(offset).Find(&books)
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": result.Error.Error(),
+		})
+	}
+
+	totalPages := int((total + int64(limit) - 1) / int64(limit))
+
+	return c.JSON(fiber.Map{
+		"page":        page,
+		"limit":       limit,
+		"total_data":  total,
+		"total_pages": totalPages,
+		"search":      search,
+		"data":        books,
+	})
 }
 
 func GetBook(c *fiber.Ctx) error {

@@ -1,15 +1,20 @@
 package middleware
 
 import (
+	"os"
+
 	"github.com/gofiber/fiber/v2"
 )
 
 func RequireAPIKey(c *fiber.Ctx) error {
-	apiKey := c.Get("X-API-Key")
-	if apiKey != "rahasia-123" {
+	apiKeyFromEnv := os.Getenv("API_KEY")
+	apiKeyFromRequest := c.Get("X-API-Key")
+
+	if apiKeyFromRequest != apiKeyFromEnv || apiKeyFromEnv == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Unauthorized: Invalid API Key",
+			"error": "Unauthorized: Invalid or missing API Key",
 		})
 	}
+
 	return c.Next()
 }
