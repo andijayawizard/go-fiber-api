@@ -12,7 +12,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// func initConfig() {
+// 	env := os.Getenv("APP_ENV")
+// 	if env == "" {
+// 		env = "dev" // default dev kalau kosong
+// 	}
+
+//		viper.SetConfigFile(".env." + env)
+//		err := viper.ReadInConfig()
+//		if err != nil {
+//			log.Fatalf("❌ Error loading config file: %v", err)
+//		}
+//	}
 func main() {
+	// initConfig()
 	// Load .env
 	err := godotenv.Load()
 	if err != nil {
