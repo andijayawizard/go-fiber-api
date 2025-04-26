@@ -1,29 +1,43 @@
-# Base image
-FROM golang:1.21-alpine
+version: '3.8'
 
-# Set environment
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
+services:
+  app:
+    build: .
+    container_name: go-fiber-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/tmp
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=yourpass
+      - DB_NAME=bookdb
+    depends_on:
+      - db
+    networks:
+      - app-net
 
-# Install dependencies
-RUN apk update && apk add --no-cache git
+  db:
+    image: postgres:14
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpass
+      POSTGRES_DB: bookdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-net
 
-# Set workdir
-WORKDIR /app
+volumes:
+  postgres_data:
 
-# Copy go.mod and go.sum
-COPY go.mod go.sum ./
-
-# Download dependencies
-RUN go mod download
-
-# Copy project files
-COPY . .
-
-# Install air (for auto reload inside container)
-RUN go install github.com/air-verse/air@latest
-
-# Command to run app using air
-CMD ["air"]
+networks:
+  app-net:
+    driver: bridge
