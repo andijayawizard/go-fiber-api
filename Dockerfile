@@ -1,11 +1,5 @@
-# Base image
+# Gunakan base image Go 1.24.2 (fix masalah versi)
 FROM golang:1.24.2-alpine
-
-# Set environment
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
 
 # Install dependencies
 RUN apk update && apk add --no-cache git
@@ -13,17 +7,22 @@ RUN apk update && apk add --no-cache git
 # Set workdir
 WORKDIR /app
 
-# Copy go.mod and go.sum
+# Copy go.mod dan go.sum terlebih dahulu (optimize cache)
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
-# Copy project files
+# Copy semua source code
 COPY . .
 
-# Install air (for auto reload inside container)
+# Buat folder tmp/ untuk binary
+RUN mkdir -p tmp
+
+# Install air
 RUN go install github.com/air-verse/air@latest
 
-# Command to run app using air
+# Build awal dummy (supaya tmp/main ada)
+RUN go build -o ./tmp/main
+
+# Jalankan Air (auto reload)
 CMD ["air"]
+# CMD ["air", "-c", ".air.dev.toml"]
