@@ -32,9 +32,14 @@ go.sum
 # ===============================
 # Environment Files
 # ===============================
+# Ignore real secrets
 .env
-.env.*
-*.local
+.env.dev
+.env.prod
+.env.staging
+
+# Tapi tetap sertakan file contoh
+!.env.example
 
 # ===============================
 # OS Files
