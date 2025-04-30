@@ -23,6 +23,8 @@ RUN go install github.com/air-verse/air@latest
 # Build awal dummy (supaya tmp/main ada)
 RUN go build -o ./tmp/main
 
-# Jalankan Air (auto reload)
-CMD ["air"]
+#production
+CMD [ "./tmp/main" ]
+# Jalankan Air (auto reload) development
+# CMD ["air"]
 # CMD ["air", "-c", ".air.dev.toml"]
