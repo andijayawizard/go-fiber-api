@@ -9,6 +9,7 @@ import (
 	"github.com/andijayawizard/go-fiber-api/models"
 	"github.com/andijayawizard/go-fiber-api/seed"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -38,6 +39,12 @@ func main() {
 	database.DB.AutoMigrate(&models.Book{})
 	seed.SeedBooks()
 
+	// Aktifkan CORS di sini
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173", // frontend Vue kamu
+		AllowHeaders: "Origin, Content-Type, Accept, X-API-Key",
+		AllowMethods: "GET,POST,PUT,DELETE",
+	}))
 	// Global middleware
 	app.Use(middleware.RequireAPIKey)
 
