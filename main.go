@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
+	"os"
 
+	"github.com/andijayawizard/go-fiber-api/controllers"
 	"github.com/andijayawizard/go-fiber-api/database"
-	"github.com/andijayawizard/go-fiber-api/handlers"
 	"github.com/andijayawizard/go-fiber-api/middleware"
 	"github.com/andijayawizard/go-fiber-api/models"
+	"github.com/andijayawizard/go-fiber-api/routes"
 	"github.com/andijayawizard/go-fiber-api/seed"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -32,10 +34,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	if os.Getenv("JWT_SECRET") == "" {
+		log.Fatal("🚨 JWT_SECRET tidak ditemukan di .env — HARUS DISET untuk keamanan!")
+	}
 	app := fiber.New()
 
 	// Connect DB & migrate
 	database.Connect()
+	database.DB.AutoMigrate(&models.User{})
 	database.DB.AutoMigrate(&models.Book{})
 	seed.SeedBooks()
 
@@ -46,14 +52,16 @@ func main() {
 		AllowMethods: "GET,POST,PUT,DELETE",
 	}))
 	// Global middleware
-	app.Use(middleware.RequireAPIKey)
+	// app.Use(middleware.RequireAPIKey)
 
-	// Routes
-	app.Get("/books", handlers.GetBooks)
-	app.Get("/books/:id", handlers.GetBook)
-	app.Post("/books", handlers.CreateBook)
-	app.Put("/books/:id", handlers.UpdateBook)
-	app.Delete("/books/:id", handlers.DeleteBook)
+	// ✳️ Public route
+	app.Post("/register", controllers.Register)
+	app.Post("/login", controllers.Login)
+	app.Post("/admin/logout", middleware.RequireAuth, controllers.Logout)
 
+	// ✅ Group yang butuh JWT
+	routes.AdminRoutes(app)
+	// ✅ Group yang butuh API key (opsional)
+	routes.PublicRoutes(app)
 	app.Listen(":8080")
 }
