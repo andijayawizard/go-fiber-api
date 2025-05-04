@@ -1,9 +1,27 @@
-# Files/folders yang gak perlu di-copy ke Docker image
-tmp/
-vendor/
-.git/
+# .dockerignore
+
+# Binaries & build output
+main
+*.exe
+*.out
+*.log
+
+# VCS & tooling
+.git
 .gitignore
+
+# Config & secrets
 .env
-*.md
+.env.*
+
+# Dev/Editor
+*.swp
+*.swo
+.idea/
+.vscode/
+node_modules/
+tmp/
+
 Dockerfile
 docker-compose.yml
+docker-compose.*.yml

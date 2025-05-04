@@ -1,0 +1,19 @@
+FROM golang:1.24-alpine AS dev
+
+# Install git, curl, SSL certs
+RUN apk add --no-cache git curl ca-certificates
+
+# Set workdir
+WORKDIR /app
+
+# Install Air dari repo resmi baru
+RUN go install github.com/air-verse/air@latest
+
+# Copy source code
+COPY . .
+
+# Expose dev port
+EXPOSE 8080
+
+# Jalankan dengan Air
+CMD ["air"]

@@ -63,9 +63,9 @@ func main() {
 	// app.Use(middleware.RequireAPIKey)
 
 	// ✳️ Public route
-	app.Post("/register", controllers.Register)
-	app.Post("/login", controllers.Login)
-	app.Post("/admin/logout", middleware.RequireAuth, controllers.Logout)
+	app.Post("/auth/register", controllers.Register)
+	app.Post("/auth/login", controllers.Login)
+	app.Post("/auth/logout", middleware.RequireAuth, controllers.Logout)
 
 	// ✅ Group yang butuh JWT
 	routes.AdminRoutes(app)
