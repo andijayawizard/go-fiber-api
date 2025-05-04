@@ -27,13 +27,21 @@ import (
 //			log.Fatalf("❌ Error loading config file: %v", err)
 //		}
 //	}
-func main() {
-	// initConfig()
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+func LoadConfig() {
+	// Opsional: hanya untuk local/dev
+	if os.Getenv("ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("Warning: error loading .env file, fallback to system env")
+		}
 	}
+}
+func main() {
+	LoadConfig()
+
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatal("🚨 JWT_SECRET tidak ditemukan di .env — HARUS DISET untuk keamanan!")
 	}
