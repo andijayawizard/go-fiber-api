@@ -1,0 +1,39 @@
+# version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-fiber-prod
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.prod
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - app-net
+
+  db:
+    image: postgres:14
+    container_name: postgres-prod
+    restart: always
+    ports:
+      - "54321:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - prod_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+volumes:
+  prod_postgres_data:
+
+networks:
+  app-net:
+    driver: bridge
