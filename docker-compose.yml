@@ -1,20 +1,20 @@
-# version: '3.8'
+# version: '3.9'
 
 services:
   app:
-    build: .
-    container_name: go-fiber-app
+    image: andijaya/go-fiber-app:dev
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: go-fiber-dev
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
+      - ./app:/app
       - /app/tmp
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+    command: air
     depends_on:
       - db
     networks:
@@ -22,21 +22,21 @@ services:
 
   db:
     image: postgres:14-alpine
-    container_name: postgres-db
+    container_name: postgres-dev
     restart: always
+    ports:
+      - "54321:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "54321:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - dev_postgres_data:/var/lib/postgresql/data
     networks:
       - app-net
 
 volumes:
-  postgres_data:
+  dev_postgres_data:
 
 networks:
   app-net:
