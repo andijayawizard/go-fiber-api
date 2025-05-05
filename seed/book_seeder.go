@@ -10,7 +10,7 @@ import (
 
 func SeedBooks() {
 	// Generate 10 buku random
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 6; i++ {
 		book := models.Book{
 			Title:  gofakeit.Sentence(3), // 3 kata judul
 			Author: gofakeit.Name(),      // Nama random

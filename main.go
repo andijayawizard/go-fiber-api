@@ -62,7 +62,6 @@ func main() {
 	// Global middleware
 	// app.Use(middleware.RequireAPIKey)
 
-	// ✳️ Public route
 	app.Post("/auth/register", controllers.Register)
 	app.Post("/auth/login", controllers.Login)
 	app.Post("/auth/logout", middleware.RequireAuth, controllers.Logout)
