@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine AS dev
+FROM golang:1.26-alpine AS dev
 
 # Install git, curl, SSL certs
 RUN apk add --no-cache git curl ca-certificates
